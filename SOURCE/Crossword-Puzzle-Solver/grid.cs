@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using ANDREICSLIB;
 using ANDREICSLIB.ClassExtras;
@@ -29,6 +30,8 @@ namespace Crossword_Puzzle_Solver
         private static readonly Color NormalBack = Color.White;
         private static readonly Color NormalFront = Color.Black;
         private static readonly Color DisabledBack = Color.Black;
+        private static bool AllowWordsOnlyOnce;
+        
 
         public static Dictionary<int, List<string>> words = new Dictionary<int, List<string>>();
 
@@ -152,7 +155,7 @@ namespace Crossword_Puzzle_Solver
                     gp.C = c;
             }
 
-            gp.Tb.Text = gp.C.ToString();
+            Baseform.ChangeTextboxText(gp.Tb, gp.C.ToString());
             SetReadonly(gp);
         }
 
@@ -178,7 +181,8 @@ namespace Crossword_Puzzle_Solver
             if (sFirstOnly.Length == 0)
                 sFirstOnly = defaultChar.ToString();
             var c2 = sFirstOnly.ToUpper()[0];
-            gp.Tb.Text = c2.ToString(CultureInfo.InvariantCulture);
+
+            Baseform.ChangeTextboxText(gp.Tb, c2.ToString(CultureInfo.InvariantCulture));
             gp.C = c2;
         }
 
@@ -211,7 +215,8 @@ namespace Crossword_Puzzle_Solver
             var gp = GetGridPointFromTextbox(tb);
             if (gp == null)
                 return;
-            gp.Tb.Text = "";
+
+            Baseform.ChangeTextboxText(gp.Tb,"");
             gp.Enabled = !gp.Enabled;
 
             SetReadonly(gp);
@@ -232,47 +237,55 @@ namespace Crossword_Puzzle_Solver
             gp.Tb.ReadOnly = !gp.Enabled;
         }
 
-        public static void Solve()
+        public static void Solve(bool allowWordsOnlyOnce)
         {
-            //go through each horizontal and vertical word, and brute force each dictionary word with same length until no spaces are left
-            var gridlocal = GridPoint.ToLight(grid, width, height);
-            var res = Solve(gridlocal);
-            if (res.Item1)
+            try
             {
-                for(int y=0;y<height;y++)
+                AllowWordsOnlyOnce = allowWordsOnlyOnce;
+
+                //go through each horizontal and vertical word, and brute force each dictionary word with same length until no spaces are left
+                var gridlocal = GridPoint.ToLight(grid, width, height);
+                var res = Solve(gridlocal, new List<string>());
+                if (res.Item1)
                 {
-                    for (int x=0;x<width;x++)
+                    for (int y = 0; y < height; y++)
                     {
-                        SetGridPointValue(grid[y][x].Tb, res.Item2[y][x].C.ToString());
+                        for (int x = 0; x < width; x++)
+                        {
+                            SetGridPointValue(grid[y][x].Tb, res.Item2[y][x].C.ToString());
+                        }
                     }
                 }
+                else
+                {
+                    MessageBox.Show("no solution found");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("no solution found");
+                if (ex is ThreadAbortException==false)
+                MessageBox.Show("ERROR:"+ex);
             }
+            Baseform.EndThread();
         }
 
-        private static Tuple<bool, GridPointLight[][]> Solve(GridPointLight[][] gridLight)
+        private static Tuple<bool, GridPointLight[][]> Solve(GridPointLight[][] gridLight,List<string> blockedWords )
         {
+            var newBlockedWords = new List<string>();
             List<SolvedWord> wordsI;
             while ((wordsI = GetIncompleteWords(gridLight)).Count != 0)
             {
                 foreach (var w in wordsI)
                 {
-                    var rws = GetRelevantWords(w);
+                    var rws = GetRelevantWords(w,blockedWords);
                     foreach (var rw in rws)
                     {
-                        if (rw.Equals("WEEDY")&&w.X==8&&w.Y==4)
-                        {
-                            int a = 0;
-                            a = 0;
-                        }
-
                         var gl = GridPointLight.Clone(gridLight,width,height);
                         SetWord(ref gl, rw, w.X, w.Y, w.Across);
-                        
-                        var ok = Solve(gl);
+                        if (AllowWordsOnlyOnce)
+                            newBlockedWords.Add(rw);
+
+                        var ok = Solve(gl,newBlockedWords);
                         if (ok.Item1)
                         {
                             return ok;
@@ -295,10 +308,10 @@ namespace Crossword_Puzzle_Solver
             }
         }
 
-        private static IEnumerable<string> GetRelevantWords(SolvedWord sw)
+        private static IEnumerable<string> GetRelevantWords(SolvedWord sw,List<string> blockedWords)
         {
             var r = new Regex(sw.Word);
-            var l = words[sw.Word.Length].Where(s => r.IsMatch(s)).ToList();
+            var l = words[sw.Word.Length].Where(s => blockedWords.Contains(s)==false&& r.IsMatch(s)).ToList();
             return l;
         }
 

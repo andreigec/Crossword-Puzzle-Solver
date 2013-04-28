@@ -29,11 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.loadfromimageB = new System.Windows.Forms.Button();
             this.createbutton = new System.Windows.Forms.Button();
             this.createheightTB = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -43,11 +45,11 @@
             this.savebutton = new System.Windows.Forms.Button();
             this.loadwordgrid = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.grid = new ANDREICSLIB.PanelReplacement();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.solveB = new System.Windows.Forms.Button();
             this.GridLetterContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toggleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.grid = new ANDREICSLIB.PanelReplacement();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -59,7 +61,8 @@
             // 
             this.menuStrip1.BackColor = System.Drawing.Color.Silver;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(440, 24);
@@ -81,9 +84,27 @@
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+            this.optionsToolStripMenuItem.Text = "Options";
+            // 
+            // solvedWordsCanOnlyBeUsedOnceToolStripMenuItem
+            // 
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.Checked = true;
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.CheckOnClick = true;
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.Name = "solvedWordsCanOnlyBeUsedOnceToolStripMenuItem";
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.Size = new System.Drawing.Size(302, 22);
+            this.solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.Text = "Words can only be used once when solving";
+            // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.loadfromimageB);
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.createbutton);
             this.groupBox1.Controls.Add(this.createheightTB);
             this.groupBox1.Controls.Add(this.label3);
@@ -94,20 +115,10 @@
             this.groupBox1.Controls.Add(this.loadwordgrid);
             this.groupBox1.Location = new System.Drawing.Point(12, 27);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(449, 106);
+            this.groupBox1.Size = new System.Drawing.Size(422, 81);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Step 1: Load or create word grid";
-            // 
-            // loadfromimageB
-            // 
-            this.loadfromimageB.Location = new System.Drawing.Point(6, 75);
-            this.loadfromimageB.Name = "loadfromimageB";
-            this.loadfromimageB.Size = new System.Drawing.Size(122, 23);
-            this.loadfromimageB.TabIndex = 10;
-            this.loadfromimageB.Text = "Load From Image";
-            this.loadfromimageB.UseVisualStyleBackColor = true;
-            this.loadfromimageB.Click += new System.EventHandler(this.loadfromimageB_Click);
             // 
             // createbutton
             // 
@@ -185,31 +196,47 @@
             // 
             // panel1
             // 
+            this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panel1.Controls.Add(this.grid);
-            this.panel1.Location = new System.Drawing.Point(12, 193);
+            this.panel1.Location = new System.Drawing.Point(12, 168);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(412, 350);
+            this.panel1.Size = new System.Drawing.Size(422, 335);
             this.panel1.TabIndex = 16;
+            // 
+            // grid
+            // 
+            this.grid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.grid.BorderColour = System.Drawing.Color.Black;
+            this.grid.BorderWidth = 0;
+            this.grid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.grid.Location = new System.Drawing.Point(0, 0);
+            this.grid.Name = "grid";
+            this.grid.Size = new System.Drawing.Size(422, 335);
+            this.grid.TabIndex = 15;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.button1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 139);
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.solveB);
+            this.groupBox2.Location = new System.Drawing.Point(12, 114);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(394, 48);
+            this.groupBox2.Size = new System.Drawing.Size(422, 48);
             this.groupBox2.TabIndex = 15;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Step 2:Solve";
             // 
-            // button1
+            // solveB
             // 
-            this.button1.Location = new System.Drawing.Point(6, 19);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Solve";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.solveB.Location = new System.Drawing.Point(6, 19);
+            this.solveB.Name = "solveB";
+            this.solveB.Size = new System.Drawing.Size(75, 23);
+            this.solveB.TabIndex = 0;
+            this.solveB.Text = "Solve";
+            this.solveB.UseVisualStyleBackColor = true;
+            this.solveB.Click += new System.EventHandler(this.button1_Click);
             // 
             // GridLetterContext
             // 
@@ -225,28 +252,16 @@
             this.toggleToolStripMenuItem.Text = "Toggle";
             this.toggleToolStripMenuItem.Click += new System.EventHandler(this.toggleToolStripMenuItem_Click);
             // 
-            // grid
-            // 
-            this.grid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.grid.BorderColour = System.Drawing.Color.Black;
-            this.grid.BorderWidth = 0;
-            this.grid.Location = new System.Drawing.Point(9, 3);
-            this.grid.Name = "grid";
-            this.grid.Size = new System.Drawing.Size(395, 333);
-            this.grid.TabIndex = 15;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(440, 566);
+            this.ClientSize = new System.Drawing.Size(440, 515);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "Form1";
@@ -269,7 +284,6 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button loadfromimageB;
         private System.Windows.Forms.Button createbutton;
         private System.Windows.Forms.TextBox createheightTB;
         private System.Windows.Forms.Label label3;
@@ -280,10 +294,12 @@
         private System.Windows.Forms.Button loadwordgrid;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button solveB;
         private ANDREICSLIB.PanelReplacement grid;
         public System.Windows.Forms.ContextMenuStrip GridLetterContext;
         private System.Windows.Forms.ToolStripMenuItem toggleToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem solvedWordsCanOnlyBeUsedOnceToolStripMenuItem;
     }
 }
 

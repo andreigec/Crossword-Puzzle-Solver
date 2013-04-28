@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using ANDREICSLIB;
 using ANDREICSLIB.ClassExtras;
@@ -40,6 +41,9 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
         public static bool AllowTbChangeEvent = true;
         #endregion locks
 
+        private Thread solvingThread;
+        
+
         public Form1()
         {
             InitializeComponent();
@@ -53,11 +57,8 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
             Licensing.CreateLicense(this, sd, menuStrip1);
             Grid.Baseform = this;
             Grid.InitPanel(grid);
-            Grid.LoadWords("words.txt");
+            Grid.LoadWords("words.dict");
             InitGrid(8, 8);
-            
-            LoadGridFromFile("c1.txt");
-           // Grid.Solve();
         }
 
 
@@ -160,6 +161,14 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
                 return;
 
             var rows = f.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            if (rows.Any(s=>s.Length>20))
+            {
+                var resp =
+                    MessageBox.Show(
+                        "Some of the rows are more than 20 chars in length, continue importing this file?","question",MessageBoxButtons.YesNo);
+                if (resp == DialogResult.No)
+                    return;
+            }
             InitGrid(rows);
             AllowLookupEvents = AllowTbChangeEvent = true;
         }
@@ -176,7 +185,7 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
 
             Grid.SaveGridToFile(sfd.FileName);
         }
-
+        /*
         private void loadfromimageB_Click(object sender, EventArgs e)
         {
             var ofd = new OpenFileDialog();
@@ -188,7 +197,8 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
                 return;
 
             LoadFromImage(ofd.FileName);
-        }
+                   }
+        
 
         private void LoadFromImage(string fn)
         {
@@ -212,10 +222,37 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
 
             AllowLookupEvents = AllowTbChangeEvent = true;
         }
+        */
 
-        private void button1_Click(object sender, EventArgs e)
+       private void button1_Click(object sender, EventArgs e)
         {
-            Grid.Solve();
+            ToggleSolve(); 
+        }
+
+        private void ToggleSolve()
+        {
+            if (solvingThread==null)
+            {
+                solveB.Text = "Abort";
+                solvingThread = new Thread(() => Grid.Solve(solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.Checked));
+                solvingThread.Start();
+            }
+            else
+            {
+                solveB.Text = "Solve";
+                solvingThread.Abort();
+                solvingThread = null;
+            }
+        }
+
+        public void ChangeTextboxText(TextBox tb,string s)
+        {
+            tb.Invoke(new MethodInvoker(delegate { tb.Text = s; }));
+        }
+
+        public void EndThread()
+        {
+            solveB.Invoke(new MethodInvoker(ToggleSolve));
         }
 
 
