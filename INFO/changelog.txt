@@ -1,2 +1,5 @@
+version 0.2
+*load words into upper case from dict
+
 version 0.1
 *initial release
