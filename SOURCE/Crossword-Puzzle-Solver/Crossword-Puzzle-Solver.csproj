@@ -87,9 +87,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="1367147807_4504.ico" />
-    <Content Include="words.txt">
+    <None Include="words.dict">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -47,11 +47,12 @@ namespace Crossword_Puzzle_Solver
 
             foreach (var w in wordssplit)
             {
+                var w2 = w.ToUpper();
                 if (words.ContainsKey(w.Length) == false)
                     words[w.Length] = new List<string>();
 
-                if (words[w.Length].Contains(w) == false)
-                    words[w.Length].Add(w);
+                if (words[w.Length].Contains(w2) == false)
+                    words[w.Length].Add(w2);
             }
         }
 

@@ -19,7 +19,7 @@ namespace Crossword_Puzzle_Solver
         #region licensing
 
         private const string AppTitle = "Crossword Puzzle Solver";
-        private const double AppVersion = 0.1;
+        private const double AppVersion = 0.2;
         private const String HelpString = "";
 
         private const String UpdatePath = "https://github.com/EvilSeven/Crossword-Puzzle-Solver/zipball/master";
