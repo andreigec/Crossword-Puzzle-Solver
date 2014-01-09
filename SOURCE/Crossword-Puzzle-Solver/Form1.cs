@@ -11,6 +11,7 @@ using System.Threading;
 using System.Windows.Forms;
 using ANDREICSLIB;
 using ANDREICSLIB.ClassExtras;
+using Crossword_Puzzle_Solver.ServiceReference1;
 
 namespace Crossword_Puzzle_Solver
 {
@@ -19,12 +20,8 @@ namespace Crossword_Puzzle_Solver
         #region licensing
 
         private const string AppTitle = "Crossword Puzzle Solver";
-        private const double AppVersion = 0.2;
+        private const double AppVersion = 0.3;
         private const String HelpString = "";
-
-        private const String UpdatePath = "https://github.com/EvilSeven/Crossword-Puzzle-Solver/zipball/master";
-        private const String VersionPath = "https://raw.github.com/EvilSeven/Crossword-Puzzle-Solver/master/INFO/version.txt";
-        private const String ChangelogPath = "https://raw.github.com/EvilSeven/Crossword-Puzzle-Solver/master/INFO/changelog.txt";
 
         private readonly String OtherText =
             @"©" + DateTime.Now.Year +
@@ -42,7 +39,6 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
         #endregion locks
 
         private Thread solvingThread;
-        
 
         public Form1()
         {
@@ -52,15 +48,39 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
         private void Form1_Load(object sender, EventArgs e)
         {
             DirectoryExtras.SetCurrentDirectoryToDefault();
-            var sd = new Licensing.SolutionDetails(HelpString, AppTitle, AppVersion, OtherText, VersionPath, UpdatePath,
-                                                   ChangelogPath);
-            Licensing.CreateLicense(this, sd, menuStrip1);
+            Licensing.CreateLicense(this, menuStrip1, new Licensing.SolutionDetails(GetDetails, HelpString, AppTitle, AppVersion, OtherText));
             Grid.Baseform = this;
             Grid.InitPanel(grid);
             Grid.LoadWords("words.dict");
             InitGrid(8, 8);
         }
 
+        public Licensing.DownloadedSolutionDetails GetDetails()
+        {
+            try
+            {
+                var sr = new ServicesClient();
+                var ti = sr.GetTitleInfo(AppTitle);
+                if (ti == null)
+                    return null;
+                return ToDownloadedSolutionDetails(ti);
+
+            }
+            catch (Exception)
+            {
+            }
+            return null;
+        }
+
+        public static Licensing.DownloadedSolutionDetails ToDownloadedSolutionDetails(TitleInfoServiceModel tism)
+        {
+            return new Licensing.DownloadedSolutionDetails()
+            {
+                ZipFileLocation = tism.LatestTitleDownloadPath,
+                ChangeLog = tism.LatestTitleChangelog,
+                Version = tism.LatestTitleVersion
+            };
+        }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -156,16 +176,16 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
         public void LoadGridFromFile(String filename)
         {
             AllowLookupEvents = AllowTbChangeEvent = false;
-            var f=FileExtras.LoadFile(filename);
+            var f = FileExtras.LoadFile(filename);
             if (f == null)
                 return;
 
             var rows = f.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            if (rows.Any(s=>s.Length>20))
+            if (rows.Any(s => s.Length > 20))
             {
                 var resp =
                     MessageBox.Show(
-                        "Some of the rows are more than 20 chars in length, continue importing this file?","question",MessageBoxButtons.YesNo);
+                        "Some of the rows are more than 20 chars in length, continue importing this file?", "question", MessageBoxButtons.YesNo);
                 if (resp == DialogResult.No)
                     return;
             }
@@ -224,14 +244,14 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
         }
         */
 
-       private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-            ToggleSolve(); 
+            ToggleSolve();
         }
 
         private void ToggleSolve()
         {
-            if (solvingThread==null)
+            if (solvingThread == null)
             {
                 solveB.Text = "Abort";
                 solvingThread = new Thread(() => Grid.Solve(solvedWordsCanOnlyBeUsedOnceToolStripMenuItem.Checked));
@@ -245,7 +265,7 @@ Zip Assets © SharpZipLib (http://www.sharpdevelop.net/OpenSource/SharpZipLib/)
             }
         }
 
-        public void ChangeTextboxText(TextBox tb,string s)
+        public void ChangeTextboxText(TextBox tb, string s)
         {
             tb.Invoke(new MethodInvoker(delegate { tb.Text = s; }));
         }
