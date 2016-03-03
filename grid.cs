@@ -361,25 +361,6 @@ namespace Crossword_Puzzle_Solver
             }
         }
 
-        private static Tuple<bool, GridPointLight[][]> SolveF(SolvedWord word, GridPointLight[][] gridLight, List<string> blockedWords, List<string> newBlockedWords)
-        {
-            var rws = GetRelevantWords(word, blockedWords);
-            foreach (var rw in rws)
-            {
-                var gl = GridPointLight.Clone(gridLight, _width, _height);
-                SetWord(ref gl, rw, word.X, word.Y, word.Across);
-                if (_allowWordsOnlyOnce)
-                    newBlockedWords.Add(rw);
-
-                var ok = Solve(gl, newBlockedWords);
-                if (ok.Item1)
-                {
-                    return ok;
-                }
-            }
-            return null;
-        }
-
 
         private static Tuple<bool, GridPointLight[][]> Solve(GridPointLight[][] gridLight, List<string> blockedWords)
         {
@@ -387,12 +368,24 @@ namespace Crossword_Puzzle_Solver
             List<SolvedWord> wordsI;
             while ((wordsI = GetIncompleteWords(gridLight)).Count != 0)
             {
-                var first =
-                    wordsI
-                        .Select(w => new { word = w, solved = SolveF(w, gridLight, blockedWords, newBlockedWords) })
-                        .FirstOrDefault(s => s.solved != null);
-                if (first != null)
-                    return first.solved;
+                foreach (var w in wordsI)
+                {
+                    var rws = GetRelevantWords(w, blockedWords);
+                    foreach (var rw in rws)
+                    {
+                        var gl = GridPointLight.Clone(gridLight, _width, _height);
+                        SetWord(ref gl, rw, w.X, w.Y, w.Across);
+                        if (_allowWordsOnlyOnce)
+                            newBlockedWords.Add(rw);
+
+                        var ok = Solve(gl, newBlockedWords);
+                        if (ok.Item1)
+                        {
+                            return ok;
+                        }
+                    }
+                    return new Tuple<bool, GridPointLight[][]>(false, null);
+                }
             }
             return new Tuple<bool, GridPointLight[][]>(true, gridLight);
         }
